@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+CACHE_FILE = os.path.expanduser("~/.local/share/remember/reminders.dat")
+
+def load_reminders():
+    if not os.path.exists(CACHE_FILE):
+        return []
+
+    with open(CACHE_FILE, 'r') as f:
+        return [line.strip() for line in f.readlines()]
+
+def save_reminders(reminders):
+    os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
+    with open(CACHE_FILE, 'w') as f:
+        f.write("\n".join(reminders) + "\n")
+
+def add_reminder(reminder):
+    reminders = load_reminders()
+    reminders.append(reminder)
+    save_reminders(reminders)
+    print(f"Reminder added: {reminder}")
+
+def list_reminders():
+    reminders = load_reminders()
+    if not reminders:
+        print("No reminders found.")
+        return
+
+    print("Current reminders:")
+    if reminders[0] == '':
+        reminders.reverse()
+        reminders.pop()
+        reminders.reverse()
+        
+    for idx, reminder in enumerate(reminders, 1):
+        print(f"  {idx}. {reminder}")
+
+def remove_last_reminder():
+    reminders = load_reminders()
+    print(reminders)
+    if not reminders:
+        print("No reminders to remove.")
+        return
+
+    reminders.pop()
+    save_reminders(reminders)
+    print("Last reminder removed.")
+
+def remove_all_reminders():
+    reminders = load_reminders()
+    if not reminders:
+        print("No reminders to remove.")
+        return
+
+    reminders.clear()
+    save_reminders(reminders)
+    print("All reminders removed.")
+
+def main():
+    if len(sys.argv) == 1:
+        list_reminders()
+    elif len(sys.argv) == 2 and sys.argv[1] == "-":
+        remove_last_reminder()
+    elif len(sys.argv) == 2 and sys.argv[1] == "--clear":
+        remove_all_reminders()
+    elif len(sys.argv) > 1:
+        reminder = " ".join(sys.argv[1:])
+        add_reminder(reminder)
+
+if __name__ == "__main__":
+    main()

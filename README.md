@@ -1,2 +1,2 @@
 # remember
-A super simple todo application written in C
+A super simple reminder application written in python.
